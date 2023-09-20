@@ -128,8 +128,8 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-#Folder
-/publications
+#Folder and files
+/pochettes
 token.csv
 publications.csv
 login.csv
