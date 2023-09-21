@@ -130,6 +130,7 @@ dmypy.json
 
 #Folder and files
 /pochettes
+/cartes
 token.csv
 publications.csv
 login.csv
