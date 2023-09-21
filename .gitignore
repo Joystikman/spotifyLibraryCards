@@ -131,6 +131,7 @@ dmypy.json
 #Folder and files
 /pochettes
 /cartes
+/cartes exemples
 token.csv
 publications.csv
 login.csv

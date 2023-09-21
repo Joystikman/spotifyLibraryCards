@@ -51,9 +51,6 @@ def getLibraryCovers(debug, access_token,url):
     data_folder = pathlib.Path("pochettes")
     cartes_folder = pathlib.Path("cartes")
 
-    #request url
-    
-
     #auth
     bearer = 'Bearer {}'
     headers = {
@@ -74,7 +71,9 @@ def getLibraryCovers(debug, access_token,url):
         if album['album']['album_type'] == 'album' :
             #var
             title_fontsize = 28
+            title_font_name = "NotoSansJP-SemiBold.ttf"
             artist_fontsize = 22
+            artist_font_name = "NotoSansJP-Light.ttf"
             #album data
             album_id = album['album']['id']
             album_uri = album['album']['uri']
@@ -89,29 +88,32 @@ def getLibraryCovers(debug, access_token,url):
             dominantcolor = DominantColor(data_folder / f'{album_id}.png')
             background_color = '{:02x}{:02x}{:02x}'.format(dominantcolor.r, dominantcolor.g, dominantcolor.b)
             spotify_code_url = f'https://scannables.scdn.co/uri/plain/png/{background_color}/white/640/{album_uri}'
-            #   print('\n'+spotify_code_url+'\n')
             spotify_code = requests.get(spotify_code_url)
             open(data_folder / f'{album_id}-code.png', 'wb').write(spotify_code.content)
             #create card
             spotify_card = Image.new('RGB',(354,531),(dominantcolor.r, dominantcolor.g, dominantcolor.b))
-            #draw image
+            #add cover + code
+            savedCover = Image.open(data_folder / f'{album_id}.png').resize((314,314))
+            savedCode = Image.open(data_folder / f'{album_id}-code.png').resize((314,74))
+            spotify_card.paste(savedCover,(getXAlignement(314),20))
+            spotify_card.paste(savedCode,(getXAlignement(314),338))
+            #convert image to draw
             spotify_card_draw = ImageDraw.Draw(spotify_card)
+            #add description zone
+            spotify_card_draw.rectangle([(0, 416), (354, 531)],fill='white')
             #get font size
-            title_fontsize = getMaxLenght(album_name,"NotoSansJP-Bold.ttf",title_fontsize,spotify_card_draw)
-            artist_fontsize = getMaxLenght(album_name,"NotoSansJP-Bold.ttf",artist_fontsize,spotify_card_draw)
+            title_fontsize = getMaxLenght(album_name,title_font_name,title_fontsize,spotify_card_draw)
+            artist_fontsize = getMaxLenght(album_name,artist_font_name,artist_fontsize,spotify_card_draw)
             # create font
-            title_font = ImageFont.truetype("NotoSansJP-Bold.ttf", title_fontsize)
-            artist_font = ImageFont.truetype("NotoSansJP-Bold.ttf", artist_fontsize)
-            print("\nPosition X du titre :")
-            print(getXAlignement(spotify_card_draw.textlength(album_name,title_font)))
+            title_font = ImageFont.truetype(title_font_name, title_fontsize)
+            artist_font = ImageFont.truetype(artist_font_name, artist_fontsize)
+            #print("\nPosition X du titre :")
+            #print(getXAlignement(spotify_card_draw.textlength(album_name,title_font)))
             # draw text
-            spotify_card_draw.text((177,350),album_name,font=title_font,fill="black",anchor="mb",align="center")
-            spotify_card_draw.text((177,390),album_artist+' - '+album_release_date[:4],font=artist_font,fill="black",anchor="mb",align="center")
+            spotify_card_draw.text((177,470),album_name,font=title_font,fill="black",anchor="mb",align="center")
+            spotify_card_draw.text((177,502),album_artist+' - '+album_release_date[:4],font=artist_font,fill="black",anchor="mb",align="center")
             #spotify_card.show()
-            savedCover = Image.open(data_folder / f'{album_id}.png').resize((254,254))
-            savedCode = Image.open(data_folder / f'{album_id}-code.png').resize((330,78))
-            spotify_card.paste(savedCover,(getXAlignement(254),28))
-            spotify_card.paste(savedCode,(getXAlignement(330),443))
+            #save card
             spotify_card.save(cartes_folder / f'{album_id}-card.png')
     if next_url is not None :
         time.sleep(3)
@@ -121,9 +123,9 @@ def getXAlignement(length):
     return int(((354/2)-(length/2)))
 
 def getMaxLenght(txt,fontname,fontsize,image):
-    print("\n### longueur du texte : ")
-    print(int(image.textlength(txt, ImageFont.truetype(fontname, fontsize))))
-    if image.textlength(txt, ImageFont.truetype(fontname, fontsize)) > 334 :
+    #print("\n### longueur du texte : ")
+    #print(int(image.textlength(txt, ImageFont.truetype(fontname, fontsize))))
+    if image.textlength(txt, ImageFont.truetype(fontname, fontsize)) > 314 :
         return getMaxLenght(txt,fontname,fontsize-1,image)
     else :
         return fontsize
