@@ -167,7 +167,7 @@ def generateCardsFromSogList(debug, access_token):
             songsList.append(json.loads(search_data.text)['albums']['items'][0])
 
     if debug :
-        print("songsList")
+        print(songsList)
     
     #Cards creation
     for album in songsList :
@@ -260,9 +260,5 @@ else :
 
 ##########################################################################
 ###########    EXECUTION    #################
-debug = True
-
-#generateCardsFromLibrary(debug,access_token,"https://api.spotify.com/v1/me/albums?limit=50&offset=0")
-#reprise - à reprendre
-#generateCardsFromLibrary(debug,access_token,"https://api.spotify.com/v1/me/albums?offset=1150&limit=50")
+debug = False
 generateCardsFromSogList(debug, access_token)
